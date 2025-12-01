@@ -1,716 +1,724 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Calendario de Turnos — Interactivo jadsimon</title>
 <style>
-  :root {
-    --primary: #2aa7a0;
-    --primary-dark: #228a83;
-    --night: #0b3b66;
-    --morning: #f6c24e;
-    --mixed: #2aa7a0;
-    --rest-border: #cfcfcf;
-    --text: #111;
-    --text-light: #666;
-    --bg: #f7f7fb;
-    --card-bg: #fff;
-    --header-bg: #f0f4fb;
-    --border: #e2e6ef;
-    --today-outline: #ff4444;
-    --highlight: rgba(42, 167, 160, 0.2);
-  }
-  
-  * {
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    margin: 0;
-    padding: 12px;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-  }
-  
-  header {
-    margin-bottom: 16px;
-  }
-  
-  h1 {
-    font-size: 1.15rem;
-    margin: 0 0 6px;
-    font-weight: 700;
-    line-height: 1.3;
-  }
-  
-  .info {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    max-width: 100%;
-  }
-  
-  .week-info {
-    background: #fff8f8;
-    border-left: 3px solid #ff4444;
-    padding: 8px 12px;
-    margin: 12px 0;
-    border-radius: 0 6px 6px 0;
-    font-weight: 600;
-    color: #d32f2f;
-    font-size: 0.85rem;
-  }
-  
-  .controls {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin: 8px 0 16px;
-    padding: 12px;
-    background: var(--card-bg);
-    border-radius: 8px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
-  }
-  
-  .shift-box {
-    min-width: 180px;
-    flex: 1;
-  }
-  
-  .shift-box h4 {
-    margin: 0 0 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-  
-  .days-grid {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-  }
-  
-  .days-grid label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 5px 8px;
-    border-radius: 6px;
-    border: 1px solid #ececec;
-    background: #fafafa;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  
-  .days-grid input[type="checkbox"] {
-    margin: 0;
-    cursor: pointer;
-    transform: scale(0.9);
-  }
-  
-  .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 12px;
-  }
-  
-  .month {
-    background: var(--card-bg);
-    border-radius: 8px;
-    padding: 12px;
-    box-shadow: 0 1px 6px rgba(20,30,60,0.05);
-    transition: transform 0.2s ease;
-  }
-  
-  .month:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 3px 10px rgba(20,30,60,0.08);
-  }
-  
-  .month-title {
-    font-weight: 700;
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-    color: var(--text);
-  }
-  
-  table.month-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-  }
-  
-  th, td {
-    padding: 6px;
-    text-align: center;
-    border: 1px solid var(--border);
-    vertical-align: top;
-    height: 60px;
-    position: relative;
-    font-size: 0.82rem;
-  }
-  
-  th {
-    background: var(--header-bg);
-    font-weight: 700;
-    color: var(--text-light);
-    font-size: 0.72rem;
-    padding: 5px;
-  }
-  
-  .week-col {
-    width: 40px;
-    background: var(--header-bg);
-    font-weight: 700;
-    color: var(--primary);
-    font-size: 0.7rem;
-    padding: 6px 2px !important;
-    text-align: center;
-  }
-  
-  td .date {
-    font-weight: 700;
-    display: block;
-    margin-bottom: 4px;
-    font-size: 0.85em;
-  }
-  
-  .turno {
-    font-size: 0.72rem;
-    padding: 3px 6px;
-    border-radius: 5px;
-    display: inline-block;
-    color: white;
-    font-weight: 600;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-  }
-  
-  .noche {
-    background: var(--night);
-  }
-  
-  .manana {
-    background: var(--morning);
-    color: var(--text);
-  }
-  
-  .mixto {
-    background: var(--mixed);
-  }
-  
-  .rest {
-    background: transparent !important;
-    color: var(--text) !important;
-    border: 1px dashed var(--rest-border);
-    padding: 3px 6px;
-    border-radius: 5px;
-    font-weight: 700;
-  }
-  
-  .other-month {
-    opacity: 0.35;
-    background: #fafafa !important;
-  }
-  
-  .today {
-    outline: 2px solid var(--today-outline) !important;
-    border-radius: 5px;
-    background: rgba(255, 68, 68, 0.05) !important;
-  }
-  
-  .highlight-week {
-    background-color: var(--highlight) !important;
-  }
-  
-  .buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
-  
-  button {
-    padding: 7px 14px;
-    border: none;
-    border-radius: 6px;
-    background: var(--primary);
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-    min-width: 130px;
-  }
-  
-  button:hover {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-  }
-  
-  button:active {
-    transform: translateY(0);
-  }
-  
-  .notification {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    padding: 10px 16px;
-    border-radius: 6px;
-    color: white;
-    font-weight: 600;
-    z-index: 1000;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    transform: translateX(200%);
-    transition: transform 0.3s ease;
-    font-size: 0.9rem;
-  }
-  
-  .notification.show {
-    transform: translateX(0);
-  }
-  
-  .success { background: #4caf50; }
-  .warning { background: #ff9800; }
-  .error { background: #f44336; }
-  
-  /* Mejor adaptación para pantallas pequeñas */
-  @media (max-width: 768px) {
-    body {
-      padding: 8px;
-    }
-    
-    .controls {
-      flex-direction: column;
-      padding: 10px;
-      gap: 10px;
-    }
-    
-    .shift-box {
-      min-width: 100%;
-    }
-    
-    .calendar-grid {
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    
-    .month {
-      padding: 10px;
-    }
-    
-    table.month-table {
-      font-size: 0.78rem;
-    }
-    
-    th, td {
-      padding: 5px;
-      height: 56px;
-    }
-    
-    th {
-      font-size: 0.68rem;
-      padding: 4px;
-    }
-    
-    .week-col {
-      width: 36px;
-      font-size: 0.68rem;
-      padding: 5px 1px !important;
-    }
-    
-    td .date {
-      font-size: 0.82em;
-      margin-bottom: 3px;
-    }
-    
-    .turno {
-      font-size: 0.7rem;
-      padding: 2px 5px;
-    }
-    
-    .buttons {
-      flex-direction: column;
-      gap: 8px;
-    }
-    
-    button {
-      min-width: auto;
-      width: 100%;
-      padding: 8px;
-      font-size: 0.92rem;
-    }
-    
-    h1 {
-      font-size: 1.1rem;
-    }
-    
-    .info {
-      font-size: 0.82rem;
-    }
-  }
-  
-  /* Optimización para pantallas muy pequeñas */
-  @media (max-width: 480px) {
-    body {
-      padding: 6px;
-    }
-    
-    .month {
-      padding: 8px;
-    }
-    
-    th, td {
-      height: 52px;
-      padding: 4px;
-    }
-    
-    .week-col {
-      width: 32px;
-      font-size: 0.65rem;
-      padding: 4px 1px !important;
-    }
-    
-    td .date {
-      font-size: 0.8em;
-    }
-    
-    .turno {
-      font-size: 0.68rem;
-      padding: 2px 4px;
-    }
-    
-    .days-grid label {
-      padding: 4px 6px;
-      font-size: 0.78rem;
-    }
-    
-    .week-info {
-      font-size: 0.82rem;
-      padding: 6px 10px;
-    }
-  }
+:root {
+--primary: #2aa7a0;
+--primary-dark: #228a83;
+--night: #0b3b66;
+--morning: #f6c24e;
+--mixed: #2aa7a0;
+--rest-border: #cfcfcf;
+--text: #111;
+--text-light: #666;
+--bg: #f7f7fb;
+--card-bg: #fff;
+--header-bg: #f0f4fb;
+--border: #e2e6ef;
+--today-outline: #ff4444;
+--diagonal-red: #ff4444;
+}
+
+* {
+box-sizing: border-box;
+}
+
+body {
+font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+margin: 0;
+padding: 12px;
+background: var(--bg);
+color: var(--text);
+line-height: 1.5;
+}
+
+header {
+margin-bottom: 16px;
+}
+
+h1 {
+font-size: 1.15rem;
+margin: 0 0 6px;
+font-weight: 700;
+line-height: 1.3;
+}
+
+.info {
+font-size: 0.85rem;
+color: var(--text-light);
+max-width: 100%;
+}
+
+.week-info {
+background: #fff8f8;
+border-left: 3px solid #ff4444;
+padding: 8px 12px;
+margin: 12px 0;
+border-radius: 0 6px 6px 0;
+font-weight: 600;
+color: #d32f2f;
+font-size: 0.85rem;
+}
+
+.controls {
+display: flex;
+gap: 12px;
+flex-wrap: wrap;
+margin: 8px 0 16px;
+padding: 12px;
+background: var(--card-bg);
+border-radius: 8px;
+box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+
+.shift-box {
+min-width: 180px;
+flex: 1;
+}
+
+.shift-box h4 {
+margin: 0 0 8px;
+font-size: 0.9rem;
+font-weight: 600;
+}
+
+.days-grid {
+display: flex;
+gap: 4px;
+flex-wrap: wrap;
+}
+
+.days-grid label {
+display: inline-flex;
+align-items: center;
+gap: 4px;
+padding: 5px 8px;
+border-radius: 6px;
+border: 1px solid #ececec;
+background: #fafafa;
+font-size: 0.8rem;
+cursor: pointer;
+transition: all 0.2s ease;
+}
+
+.days-grid input[type="checkbox"] {
+margin: 0;
+cursor: pointer;
+transform: scale(0.9);
+}
+
+.calendar-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+gap: 12px;
+}
+
+.month {
+background: var(--card-bg);
+border-radius: 8px;
+padding: 12px;
+box-shadow: 0 1px 6px rgba(20,30,60,0.05);
+transition: transform 0.2s ease;
+position: relative;
+}
+
+.month:hover {
+transform: translateY(-2px);
+box-shadow: 0 3px 10px rgba(20,30,60,0.08);
+}
+
+.month-title {
+font-weight: 700;
+font-size: 0.95rem;
+margin-bottom: 10px;
+color: var(--text);
+}
+
+table.month-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 0.82rem;
+}
+
+th, td {
+padding: 6px;
+text-align: center;
+border: 1px solid var(--border);
+vertical-align: top;
+height: 60px;
+position: relative;
+font-size: 0.82rem;
+}
+
+th {
+background: var(--header-bg);
+font-weight: 700;
+color: var(--text-light);
+font-size: 0.72rem;
+padding: 5px;
+}
+
+.week-col {
+width: 40px;
+background: var(--header-bg);
+font-weight: 700;
+color: var(--primary);
+font-size: 0.7rem;
+padding: 6px 2px !important;
+text-align: center;
+}
+
+td .date {
+font-weight: 700;
+display: block;
+margin-bottom: 4px;
+font-size: 0.85em;
+}
+
+.turno {
+font-size: 0.72rem;
+padding: 3px 6px;
+border-radius: 5px;
+display: inline-block;
+color: white;
+font-weight: 600;
+text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+max-width: 100%;
+}
+
+.noche {
+background: var(--night);
+}
+
+.manana {
+background: var(--morning);
+color: var(--text);
+}
+
+.mixto {
+background: var(--mixed);
+}
+
+.rest {
+background: transparent !important;
+color: var(--text) !important;
+border: 1px dashed var(--rest-border);
+padding: 3px 6px;
+border-radius: 5px;
+font-weight: 700;
+}
+
+.other-month {
+opacity: 0.35;
+background: #fafafa !important;
+}
+
+.today {
+outline: 2px solid var(--today-outline) !important;
+border-radius: 5px;
+background: rgba(255, 68, 68, 0.05) !important;
+}
+
+/* Estilo para la diagonal roja EN UN SOLO DÍA */
+.diagonal-overlay {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: 1;
+border-radius: 5px;
+overflow: hidden;
+}
+
+.diagonal-overlay::before {
+content: '';
+position: absolute;
+top: 50%;
+left: 50%;
+width: 141%;
+height: 3px;
+background: var(--diagonal-red);
+transform: translate(-50%, -50%) rotate(-45deg);
+transform-origin: center;
+}
+
+.buttons {
+display: flex;
+gap: 10px;
+margin-top: 14px;
+flex-wrap: wrap;
+}
+
+button {
+padding: 7px 14px;
+border: none;
+border-radius: 6px;
+background: var(--primary);
+color: white;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.2s ease;
+font-size: 0.9rem;
+min-width: 130px;
+}
+
+button:hover {
+background: var(--primary-dark);
+transform: translateY(-1px);
+}
+
+button:active {
+transform: translateY(0);
+}
+
+.notification {
+position: fixed;
+top: 16px;
+right: 16px;
+padding: 10px 16px;
+border-radius: 6px;
+color: white;
+font-weight: 600;
+z-index: 1000;
+box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+transform: translateX(200%);
+transition: transform 0.3s ease;
+font-size: 0.9rem;
+}
+
+.notification.show {
+transform: translateX(0);
+}
+
+.success { background: #4caf50; }
+.warning { background: #ff9800; }
+.error { background: #f44336; }
+
+/* Mejor adaptación para pantallas pequeñas */
+@media (max-width: 768px) {
+body {
+padding: 8px;
+}
+
+.controls {
+flex-direction: column;
+}
+
+.shift-box {
+min-width: 100%;
+}
+
+.calendar-grid {
+grid-template-columns: 1fr;
+gap: 10px;
+}
+
+.month {
+padding: 10px;
+}
+
+table.month-table {
+font-size: 0.78rem;
+}
+
+th, td {
+padding: 5px;
+height: 56px;
+}
+
+th {
+font-size: 0.68rem;
+padding: 4px;
+}
+
+.week-col {
+width: 36px;
+font-size: 0.68rem;
+padding: 5px 1px !important;
+}
+
+td .date {
+font-size: 0.82em;
+margin-bottom: 3px;
+}
+
+.turno {
+font-size: 0.7rem;
+padding: 2px 5px;
+}
+
+.buttons {
+flex-direction: column;
+gap: 8px;
+}
+
+button {
+min-width: auto;
+width: 100%;
+padding: 8px;
+font-size: 0.92rem;
+}
+
+h1 {
+font-size: 1.1rem;
+}
+
+.info {
+font-size: 0.82rem;
+}
+}
 </style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>Calendario personal de turnos — Interactivo jadsimon</h1>
-    <div class="info">Periodo: <strong>15 Sep 2025</strong> → <strong>14 Sep 2026</strong> · Ciclo: <strong>4 semanas Noche → 4 semanas Mañana → 4 semanas Mixto</strong></div>
-    <div class="week-info" id="current-week-info"></div>
-  </div>
+<div>
+<h1>Calendario personal de turnos — Interactivo jadsimon</h1>
+<div class="info">Periodo: <strong>15 Sep 2025</strong> → <strong>14 Sep 2026</strong> · Ciclo: <strong>4 semanas Noche → 4 semanas Mañana → 4 semanas Mixto</strong></div>
+<div class="week-info" id="current-week-info"></div>
+</div>
 </header>
 
 <section class="controls" id="controls"></section>
 
 <main>
-  <div class="calendar-grid" id="calendar"></div>
+<div class="calendar-grid" id="calendar"></div>
 </main>
 
 <div id="notification" class="notification"></div>
 
 <script>
 (function(){
-  const start = new Date(2025,8,15); 
-  const daysToGenerate = 365;
-  const shifts = ['Noche','Mañana','Mixto'];
-  const shiftClasses = {'Noche':'noche','Mañana':'manana','Mixto':'mixto'};
-  const shiftDisplayNames = {'Noche':'Noc.','Mañana':'Día','Mixto':'Mix'};
-  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const weekdayLabels = ['L','M','M','J','V','S','D'];
-  const weekdayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']; 
+const start = new Date(2025,8,15); 
+const daysToGenerate = 365;
+const shifts = ['Noche','Mañana','Mixto'];
+const shiftClasses = {'Noche':'noche','Mañana':'manana','Mixto':'mixto'};
+const shiftDisplayNames = {'Noche':'Noc.','Mañana':'Día','Mixto':'Mix'};
+const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const weekdayLabels = ['L','M','M','J','V','S','D'];
+const weekdayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']; 
 
-  const defaultRest = {
-    'Noche': [0,1],   
-    'Mañana': [4,5],
-    'Mixto': [2,3,6]    
-  };
+const defaultRest = {
+'Noche': [0,1],   
+'Mañana': [4,5],
+'Mixto': [2,3,6]    
+};
 
-  let simulatedStorage = JSON.stringify(defaultRest);
+// ✅ CONFIGURACIÓN DE DÍAS ESPECIALES CON DIAGONAL ROJA
+// Formato: 'YYYY-M-D' donde M es: Enero=0, Febrero=1, ... Diciembre=11
+const defaultSpecialDays = [
+'2025-11-12',
+'2025-11-13',
+'2025-11-24',  // 20 de Diciembre 2025 (mes 11 = diciembre)
+'2025-11-25',  // 25 de Diciembre 2025 (Navidad)
+'2025-11-31',
+];
 
-  const controlsEl = document.getElementById('controls');
-  const notificationEl = document.getElementById('notification');
-  const currentWeekInfoEl = document.getElementById('current-week-info');
+// Simulamos localStorage con una variable en memoria
+let simulatedStorage = JSON.stringify({
+restConfig: defaultRest,
+specialDays: defaultSpecialDays
+});
 
-  function getWeekNumber(date) {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-  }
+const controlsEl = document.getElementById('controls');
+const notificationEl = document.getElementById('notification');
+const currentWeekInfoEl = document.getElementById('current-week-info');
 
-  function getCurrentRealDate() {
-    return new Date();
-  }
+function getWeekNumber(date) {
+const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+const dayNum = d.getUTCDay() || 7;
+d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
 
-  function showNotification(message, type = 'success') {
-    notificationEl.textContent = message;
-    notificationEl.className = `notification ${type} show`;
-    setTimeout(() => {
-      notificationEl.classList.remove('show');
-    }, 3000);
-  }
+function getCurrentRealDate() {
+return new Date();
+}
 
-  function buildControls(restByShift){
-    controlsEl.innerHTML = '';
-    shifts.forEach(shift=>{
-      const box = document.createElement('div');
-      box.className = 'shift-box';
-      const h = document.createElement('h4');
-      h.textContent = shift + ' — marcar días de DESCANSO';
-      box.appendChild(h);
+function showNotification(message, type = 'success') {
+notificationEl.textContent = message;
+notificationEl.className = `notification ${type} show`;
+setTimeout(() => {
+notificationEl.classList.remove('show');
+}, 3000);
+}
 
-      const daysWrap = document.createElement('div');
-      daysWrap.className = 'days-grid';
-      for(let d=0; d<7; d++){
-        const id = `chk-${shift}-${d}`;
-        const lbl = document.createElement('label');
-        const inp = document.createElement('input');
-        inp.type = 'checkbox';
-        inp.id = id;
-        inp.dataset.shift = shift;
-        inp.dataset.day = d.toString();
-        inp.checked = (restByShift[shift] || []).includes(d);
-        inp.addEventListener('change', ()=>renderCalendar(readRestConfig()));
-        const span = document.createElement('span');
-        span.textContent = weekdayNames[d];
-        lbl.appendChild(inp);
-        lbl.appendChild(span);
-        daysWrap.appendChild(lbl);
-      }
-      box.appendChild(daysWrap);
-      controlsEl.appendChild(box);
-    });
+function buildControls(restByShift){
+controlsEl.innerHTML = '';
+shifts.forEach(shift=>{
+const box = document.createElement('div');
+box.className = 'shift-box';
+const h = document.createElement('h4');
+h.textContent = shift + ' — marcar días de DESCANSO';
+box.appendChild(h);
 
-    const btns = document.createElement('div');
-    btns.className = 'buttons';
-    const saveBtn = document.createElement('button');
-    saveBtn.textContent = "Guardar configuración";
-    saveBtn.onclick = saveConfig;
-    const loadBtn = document.createElement('button');
-    loadBtn.textContent = "Restaurar configuración";
-    loadBtn.onclick = loadConfig;
-    btns.appendChild(saveBtn);
-    btns.appendChild(loadBtn);
-    controlsEl.appendChild(btns);
-  }
+const daysWrap = document.createElement('div');
+daysWrap.className = 'days-grid';
+for(let d=0; d<7; d++){
+const id = `chk-${shift}-${d}`;
+const lbl = document.createElement('label');
+const inp = document.createElement('input');
+inp.type = 'checkbox';
+inp.id = id;
+inp.dataset.shift = shift;
+inp.dataset.day = d.toString();
+inp.checked = (restByShift[shift] || []).includes(d);
+inp.addEventListener('change', ()=>renderCalendar(readRestConfig()));
+const span = document.createElement('span');
+span.textContent = weekdayNames[d];
+lbl.appendChild(inp);
+lbl.appendChild(span);
+daysWrap.appendChild(lbl);
+}
+box.appendChild(daysWrap);
+controlsEl.appendChild(box);
+});
 
-  function readRestConfig(){
-    const cfg = {'Noche':[], 'Mañana':[], 'Mixto':[]};
-    const inputs = controlsEl.querySelectorAll('input[type="checkbox"]');
-    inputs.forEach(inp=>{
-      if(inp.checked){
-        cfg[inp.dataset.shift].push(Number(inp.dataset.day));
-      }
-    });
-    return cfg;
-  }
+// Botones
+const btns = document.createElement('div');
+btns.className = 'buttons';
+const saveBtn = document.createElement('button');
+saveBtn.textContent = "Guardar configuración";
+saveBtn.onclick = saveConfig;
+const loadBtn = document.createElement('button');
+loadBtn.textContent = "Restaurar configuración";
+loadBtn.onclick = loadConfig;
+btns.appendChild(saveBtn);
+btns.appendChild(loadBtn);
+controlsEl.appendChild(btns);
+}
 
-  function saveConfig(){
-    const cfg = readRestConfig();
-    simulatedStorage = JSON.stringify(cfg);
-    showNotification("✅ Configuración guardada");
-  }
+function readRestConfig(){
+const cfg = {'Noche':[], 'Mañana':[], 'Mixto':[]};
+const inputs = controlsEl.querySelectorAll('input[type="checkbox"]');
+inputs.forEach(inp=>{
+if(inp.checked){
+cfg[inp.dataset.shift].push(Number(inp.dataset.day));
+}
+});
+return cfg;
+}
 
-  function loadConfig(){
-    try {
-      const cfg = JSON.parse(simulatedStorage);
-      buildControls(cfg);
-      renderCalendar(cfg);
-      showNotification("🔄 Configuración restaurada");
-    } catch (e) {
-      showNotification("⚠️ No hay configuración guardada", 'warning');
-    }
-  }
+function saveConfig(){
+const cfg = readRestConfig();
+const specialDays = JSON.parse(simulatedStorage).specialDays || defaultSpecialDays;
+simulatedStorage = JSON.stringify({
+restConfig: cfg,
+specialDays: specialDays
+});
+showNotification("✅ Configuración guardada");
+}
 
-  function generateDays(){
-    const arr = [];
-    for(let i=0;i<daysToGenerate;i++){
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      const blockIndex = Math.floor(i/28);
-      const shift = shifts[blockIndex % shifts.length];
-      arr.push({date: d, shift});
-    }
-    return arr;
-  }
+function loadConfig(){
+try {
+const data = JSON.parse(simulatedStorage);
+const cfg = data.restConfig || defaultRest;
+buildControls(cfg);
+renderCalendar(cfg);
+showNotification("🔄 Configuración restaurada");
+} catch (e) {
+showNotification("⚠️ No hay configuración guardada", 'warning');
+}
+}
 
-  function renderCalendar(restByShift){
-    const days = generateDays();
-    const months = {};
-    days.forEach(item=>{
-      const key = `${item.date.getFullYear()}-${item.date.getMonth()}`;
-      if(!months[key]) months[key]=[];
-      months[key].push(item);
-    });
+function generateDays(){
+const arr = [];
+for(let i=0;i<daysToGenerate;i++){
+const d = new Date(start);
+d.setDate(start.getDate() + i);
+const blockIndex = Math.floor(i/28);
+const shift = shifts[blockIndex % shifts.length];
+arr.push({date: d, shift});
+}
+return arr;
+}
 
-    const keys = Object.keys(months).sort((a,b)=>{
-      const [ay,am] = a.split('-').map(Number);
-      const [by,bm] = b.split('-').map(Number);
-      return ay!==by?ay-by:am-bm;
-    });
+function renderCalendar(restByShift){
+const days = generateDays();
+const months = {};
+days.forEach(item=>{
+const key = `${item.date.getFullYear()}-${item.date.getMonth()}`;
+if(!months[key]) months[key]=[];
+months[key].push(item);
+});
 
-    const cal = document.getElementById('calendar');
-    cal.innerHTML = '';
-    
-    const todayReal = getCurrentRealDate();
-    const todayRealStr = `${todayReal.getFullYear()}-${todayReal.getMonth()}-${todayReal.getDate()}`;
-    const currentWeekOfYear = getWeekNumber(todayReal);
-    currentWeekInfoEl.textContent = `📅 Semana actual del año: ${currentWeekOfYear}`;
-    currentWeekInfoEl.style.display = 'block';
+const keys = Object.keys(months).sort((a,b)=>{
+const [ay,am] = a.split('-').map(Number);
+const [by,bm] = b.split('-').map(Number);
+return ay!==by?ay-by:am-bm;
+});
 
-    const currentMonthKey = `${todayReal.getFullYear()}-${todayReal.getMonth()}`;
-    let targetMonthElement = null;
+const cal = document.getElementById('calendar');
+cal.innerHTML = '';
 
-    keys.forEach(key=>{
-      const [year,month] = key.split('-').map(Number);
-      const monthDays = months[key];
-      const monthEl = document.createElement('section'); 
-      monthEl.className = 'month';
-      if (key === currentMonthKey) {
-        monthEl.id = 'current-month';
-        targetMonthElement = monthEl;
-      }
-      
-      const title = document.createElement('div'); 
-      title.className = 'month-title';
-      title.textContent = `${monthNames[month]} ${year}`;
-      monthEl.appendChild(title);
+const todayReal = getCurrentRealDate();
+const todayRealStr = `${todayReal.getFullYear()}-${todayReal.getMonth()}-${todayReal.getDate()}`;
 
-      const table = document.createElement('table'); 
-      table.className = 'month-table';
-      const thead = document.createElement('thead'); 
-      const headRow = document.createElement('tr');
-      
-      const weekHeader = document.createElement('th');
-      weekHeader.textContent = 'Sem';
-      weekHeader.className = 'week-col';
-      headRow.appendChild(weekHeader);
-      
-      weekdayLabels.forEach(lbl => { 
-        const th = document.createElement('th'); 
-        th.textContent = lbl; 
-        headRow.appendChild(th); 
-      });
-      thead.appendChild(headRow); 
-      table.appendChild(thead);
+const currentWeekOfYear = getWeekNumber(todayReal);
+currentWeekInfoEl.textContent = `📅 Semana actual del año: ${currentWeekOfYear}`;
+currentWeekInfoEl.style.display = 'block';
 
-      const tbody = document.createElement('tbody');
-      const firstOfMonth = new Date(year, month, 1);
-      const offset = (firstOfMonth.getDay() + 6) % 7; 
-      const daysInMonth = new Date(year, month+1, 0).getDate();
-      const cells = [];
-      for(let i=0;i<offset;i++) cells.push(null);
-      for(let d=1; d<=daysInMonth; d++){
-        const dt = new Date(year, month, d);
-        const matched = monthDays.find(x => x.date.getDate() === d);
-        if(matched) cells.push(matched);
-        else cells.push({date: dt, shift: null, outOfRange: true});
-      }
-      while(cells.length % 7 !== 0) cells.push(null);
+const currentMonthKey = `${todayReal.getFullYear()}-${todayReal.getMonth()}`;
+let targetMonthElement = null;
 
-      for(let r=0; r<cells.length/7; r++){
-        const tr = document.createElement('tr');
-        
-        let firstValidDate = null;
-        for(let c=0; c<7; c++){
-          const idx = r*7 + c;
-          const cell = cells[idx];
-          if(cell && !cell.outOfRange) {
-            firstValidDate = cell.date;
-            break;
-          }
-        }
-        
-        if(!firstValidDate && cells.length > 0) {
-          const firstCell = cells[r*7];
-          if(firstCell) firstValidDate = firstCell.date;
-        }
-        
-        const weekTd = document.createElement('td');
-        weekTd.className = 'week-col';
-        if(firstValidDate) {
-          const weekNumber = getWeekNumber(firstValidDate);
-          weekTd.textContent = weekNumber;
-        } else {
-          weekTd.textContent = '';
-        }
-        tr.appendChild(weekTd);
-        
-        for(let c=0;c<7;c++){
-          const idx = r*7 + c;
-          const cell = cells[idx];
-          const td = document.createElement('td');
-          if(!cell){
-            td.className='other-month';
-          } else {
-            const dayNum = document.createElement('span'); 
-            dayNum.className='date';
-            dayNum.textContent = cell.date.getDate();
-            td.appendChild(dayNum);
+// ✅ Leer días especiales desde la configuración
+const specialDays = JSON.parse(simulatedStorage).specialDays || defaultSpecialDays;
 
-            if(cell.shift){
-              const jsDay = cell.date.getDay(); 
-              const rests = restByShift[cell.shift] || [];
-              const isRest = rests.includes(jsDay);
-              const span = document.createElement('span');
-              if(isRest){
-                span.className = 'turno rest';
-                span.textContent = 'D';
-              } else {
-                span.className = 'turno ' + shiftClasses[cell.shift];
-                span.textContent = shiftDisplayNames[cell.shift];
-              }
-              td.appendChild(span);
-            } else {
-              td.classList.add('other-month');
-            }
+keys.forEach(key=>{
+const [year,month] = key.split('-').map(Number);
+const monthDays = months[key];
+const monthEl = document.createElement('section'); 
+monthEl.className = 'month';
+if (key === currentMonthKey) {
+monthEl.id = 'current-month';
+targetMonthElement = monthEl;
+}
 
-            const cellDateStr = `${cell.date.getFullYear()}-${cell.date.getMonth()}-${cell.date.getDate()}`;
-            if (cellDateStr === todayRealStr) {
-              td.classList.add('today');
-            }
-            
-            // Highlight current week
-            if (firstValidDate && getWeekNumber(firstValidDate) === currentWeekOfYear) {
-              td.classList.add('highlight-week');
-            }
-          }
-          tr.appendChild(td);
-        }
-        tbody.appendChild(tr);
-      }
+const title = document.createElement('div'); 
+title.className = 'month-title';
+title.textContent = `${monthNames[month]} ${year}`;
+monthEl.appendChild(title);
 
-      table.appendChild(tbody);
-      monthEl.appendChild(table);
-      cal.appendChild(monthEl);
-    });
-    
-    setTimeout(() => {
-      if (targetMonthElement) {
-        targetMonthElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'start' 
-        });
-        targetMonthElement.style.boxShadow = '0 0 0 3px rgba(42, 167, 160, 0.4)';
-        setTimeout(() => {
-          targetMonthElement.style.boxShadow = '0 1px 6px rgba(20,30,60,0.05)';
-        }, 2000);
-      }
-    }, 100);
-  }
+const table = document.createElement('table'); 
+table.className = 'month-table';
+const thead = document.createElement('thead'); 
+const headRow = document.createElement('tr');
 
-  // Inicialización
-  const initialConfig = defaultRest;
-  buildControls(initialConfig);
-  renderCalendar(initialConfig);
+const weekHeader = document.createElement('th');
+weekHeader.textContent = 'Sem';
+weekHeader.className = 'week-col';
+headRow.appendChild(weekHeader);
+
+weekdayLabels.forEach(lbl => { 
+const th = document.createElement('th'); 
+th.textContent = lbl; 
+headRow.appendChild(th); 
+});
+thead.appendChild(headRow); 
+table.appendChild(thead);
+
+const tbody = document.createElement('tbody');
+const firstOfMonth = new Date(year, month, 1);
+const offset = (firstOfMonth.getDay() + 6) % 7; 
+const daysInMonth = new Date(year, month+1, 0).getDate();
+const cells = [];
+for(let i=0;i<offset;i++) cells.push(null);
+for(let d=1; d<=daysInMonth; d++){
+const dt = new Date(year, month, d);
+const matched = monthDays.find(x => x.date.getDate() === d);
+if(matched) cells.push(matched);
+else cells.push({date: dt, shift: null, outOfRange: true});
+}
+while(cells.length % 7 !== 0) cells.push(null);
+
+for(let r=0; r<cells.length/7; r++){
+const tr = document.createElement('tr');
+
+let firstValidDate = null;
+for(let c=0; c<7; c++){
+const idx = r*7 + c;
+const cell = cells[idx];
+if(cell && !cell.outOfRange) {
+firstValidDate = cell.date;
+break;
+}
+}
+
+if(!firstValidDate && cells.length > 0) {
+const firstCell = cells[r*7];
+if(firstCell) firstValidDate = firstCell.date;
+}
+
+const weekTd = document.createElement('td');
+weekTd.className = 'week-col';
+if(firstValidDate) {
+const weekNumber = getWeekNumber(firstValidDate);
+weekTd.textContent = weekNumber;
+} else {
+weekTd.textContent = '';
+}
+tr.appendChild(weekTd);
+
+for(let c=0;c<7;c++){
+const idx = r*7 + c;
+const cell = cells[idx];
+const td = document.createElement('td');
+if(!cell){
+td.className='other-month';
+} else {
+const dayNum = document.createElement('span'); 
+dayNum.className='date';
+dayNum.textContent = cell.date.getDate();
+td.appendChild(dayNum);
+
+if(cell.shift){
+const jsDay = cell.date.getDay(); 
+const rests = restByShift[cell.shift] || [];
+const isRest = rests.includes(jsDay);
+const span = document.createElement('span');
+if(isRest){
+span.className = 'turno rest';
+span.textContent = 'D';
+} else {
+span.className = 'turno ' + shiftClasses[cell.shift];
+span.textContent = shiftDisplayNames[cell.shift];
+}
+td.appendChild(span);
+} else {
+td.classList.add('other-month');
+}
+
+const cellDateStr = `${cell.date.getFullYear()}-${cell.date.getMonth()}-${cell.date.getDate()}`;
+if (cellDateStr === todayRealStr) {
+td.classList.add('today');
+}
+
+// ✅ Verificar si este DÍA específico está en la lista de días especiales
+if (specialDays.includes(cellDateStr)) {
+const diagonal = document.createElement('div');
+diagonal.className = 'diagonal-overlay';
+td.style.position = 'relative';
+td.appendChild(diagonal);
+}
+}
+tr.appendChild(td);
+}
+tbody.appendChild(tr);
+}
+
+table.appendChild(tbody);
+monthEl.appendChild(table);
+cal.appendChild(monthEl);
+});
+
+setTimeout(() => {
+if (targetMonthElement) {
+targetMonthElement.scrollIntoView({ 
+behavior: 'smooth', 
+block: 'start' 
+});
+targetMonthElement.style.boxShadow = '0 0 0 3px rgba(42, 167, 160, 0.4)';
+setTimeout(() => {
+targetMonthElement.style.boxShadow = '0 1px 6px rgba(20,30,60,0.05)';
+}, 2000);
+}
+}, 100);
+}
+
+// Inicialización
+const savedData = JSON.parse(simulatedStorage);
+const initialConfig = savedData.restConfig || defaultRest;
+buildControls(initialConfig);
+renderCalendar(initialConfig);
+
 })();
 </script>
 </body>
