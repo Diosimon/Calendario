@@ -20,13 +20,14 @@
 --border: #e2e6ef;
 --today-outline: #ff4444;
 --diagonal-red: #ff4444;
+--vacation: #9b59b6;
 }
 * { box-sizing: border-box; }
 body {
 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 margin: 0; padding: 12px; background: var(--bg); color: var(--text); line-height: 1.5;
 }
-header { margin-bottom: 16px; }
+header { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 h1 { font-size: 1.15rem; margin: 0 0 6px; font-weight: 700; line-height: 1.3; }
 .info { font-size: 0.85rem; color: var(--text-light); max-width: 100%; }
 .week-info {
@@ -89,6 +90,11 @@ pointer-events: none; z-index: 1; border-radius: 5px; overflow: hidden;
 content: ''; position: absolute; top: 50%; left: 50%; width: 141%; height: 3px;
 background: var(--diagonal-red); transform: translate(-50%, -50%) rotate(-45deg); transform-origin: center;
 }
+.vacation-badge {
+position: absolute; bottom: 3px; left: 3px; right: 3px; font-size: 0.62rem;
+background: var(--vacation); color: white; border-radius: 4px; padding: 1px 3px;
+font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 2;
+}
 .buttons { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
 button {
 padding: 7px 14px; border: none; border-radius: 6px; background: var(--primary);
@@ -97,15 +103,74 @@ font-size: 0.9rem; min-width: 130px;
 }
 button:hover { background: var(--primary-dark); transform: translateY(-1px); }
 button:active { transform: translateY(0); }
+button.secondary { background: #888; }
+button.secondary:hover { background: #666; }
+button.danger { background: #c0392b; }
+button.danger:hover { background: #962d22; }
 .notification {
 position: fixed; top: 16px; right: 16px; padding: 10px 16px; border-radius: 6px;
 color: white; font-weight: 600; z-index: 1000; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-transform: translateX(200%); transition: transform 0.3s ease; font-size: 0.9rem;
+transform: translateX(200%); transition: transform 0.3s ease; font-size: 0.9rem; max-width: 90vw;
 }
 .notification.show { transform: translateX(0); }
 .success { background: #4caf50; }
 .warning { background: #ff9800; }
 .error { background: #f44336; }
+
+/* ---- Auth / sesión ---- */
+.session-box {
+background: var(--card-bg); border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+display: flex; align-items: center; gap: 10px; font-size: 0.85rem; flex-wrap: wrap;
+}
+.session-box .who { font-weight: 700; color: var(--primary-dark); }
+.session-box button { min-width: auto; padding: 6px 10px; font-size: 0.8rem; }
+
+/* ---- Modales ---- */
+.modal-overlay {
+position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none;
+align-items: center; justify-content: center; z-index: 2000; padding: 16px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+background: #fff; border-radius: 10px; padding: 20px; max-width: 420px; width: 100%;
+max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.modal h3 { margin: 0 0 14px; font-size: 1.05rem; }
+.modal label { display: block; font-size: 0.82rem; font-weight: 600; margin: 10px 0 4px; color: var(--text-light); }
+.modal input, .modal select {
+width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+font-size: 0.9rem; font-family: inherit;
+}
+.modal .modal-buttons { display: flex; gap: 8px; margin-top: 16px; }
+.modal .modal-buttons button { flex: 1; min-width: 0; }
+.modal .close-x {
+position: absolute; top: 10px; right: 14px; cursor: pointer; font-size: 1.3rem;
+color: var(--text-light); background: none; border: none; padding: 0; min-width: auto;
+}
+.modal { position: relative; }
+.tab-row { display: flex; gap: 6px; margin-bottom: 10px; }
+.tab-row button {
+flex: 1; background: #eee; color: var(--text); min-width: 0; padding: 7px;
+}
+.tab-row button.active { background: var(--primary); color: #fff; }
+.employee-list { margin-top: 10px; max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; }
+.employee-row {
+display: flex; justify-content: space-between; align-items: center; padding: 8px 10px;
+border-bottom: 1px solid var(--border); font-size: 0.85rem; gap: 8px;
+}
+.employee-row:last-child { border-bottom: none; }
+.employee-row .meta { flex: 1; }
+.employee-row .meta strong { display: block; }
+.employee-row .meta span { color: var(--text-light); font-size: 0.78rem; }
+.employee-row .row-actions { display: flex; gap: 4px; }
+.employee-row .row-actions button { min-width: auto; padding: 4px 8px; font-size: 0.75rem; }
+.vacation-list-item {
+display: flex; justify-content: space-between; align-items: center; padding: 8px 10px;
+border-bottom: 1px solid var(--border); font-size: 0.82rem; gap: 8px;
+}
+.vacation-list-item:last-child { border-bottom: none; }
+.vacation-list-item button { min-width: auto; padding: 4px 8px; font-size: 0.75rem; }
+
 @media (max-width: 768px) {
 body { padding: 8px; }
 .controls { flex-direction: column; }
@@ -122,6 +187,7 @@ td .date { font-size: 0.82em; margin-bottom: 3px; }
 button { min-width: auto; width: 100%; padding: 8px; font-size: 0.92rem; }
 h1 { font-size: 1.1rem; }
 .info { font-size: 0.82rem; }
+header { flex-direction: column; }
 }
 </style>
 </head>
@@ -132,9 +198,14 @@ h1 { font-size: 1.1rem; }
 <div class="info">Periodo: <strong>Feb 2026</strong> → <strong>31 Dic 2026</strong> · Ciclo: <strong>4 semanas Noche → 4 semanas Mañana → 4 semanas Mixto</strong></div>
 <div class="week-info" id="current-week-info"></div>
 </div>
+<div class="session-box" id="session-box">
+  <span>Cargando sesión…</span>
+</div>
 </header>
 
 <section class="controls" id="controls"></section>
+
+<div class="buttons" id="action-buttons" style="margin-bottom:16px;"></div>
 
 <main>
 <div class="calendar-grid" id="calendar"></div>
@@ -142,12 +213,116 @@ h1 { font-size: 1.1rem; }
 
 <div id="notification" class="notification"></div>
 
+<!-- ===== Modal: Login ===== -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal">
+    <button class="close-x" data-close="modal-login">&times;</button>
+    <h3>Iniciar sesión</h3>
+    <label>Número de empleado</label>
+    <input type="text" id="login-numero" placeholder="Ej. 1023" inputmode="numeric" />
+    <label>Contraseña</label>
+    <input type="password" id="login-password" placeholder="Contraseña" />
+    <div class="modal-buttons">
+      <button class="secondary" data-close="modal-login">Cancelar</button>
+      <button id="btn-do-login">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Agregar vacaciones ===== -->
+<div class="modal-overlay" id="modal-vacaciones">
+  <div class="modal">
+    <button class="close-x" data-close="modal-vacaciones">&times;</button>
+    <h3>Registrar vacaciones</h3>
+    <label>Empleado</label>
+    <select id="vac-empleado"></select>
+    <label>Fecha inicio</label>
+    <input type="date" id="vac-inicio" />
+    <label>Fecha fin</label>
+    <input type="date" id="vac-fin" />
+    <label>Nota (opcional)</label>
+    <input type="text" id="vac-nota" placeholder="Ej. Vacaciones de verano" />
+    <div class="modal-buttons">
+      <button class="secondary" data-close="modal-vacaciones">Cancelar</button>
+      <button id="btn-save-vacacion">Guardar</button>
+    </div>
+    <div class="employee-list" id="vac-list" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<!-- ===== Modal: Panel admin (gestión de empleados) ===== -->
+<div class="modal-overlay" id="modal-admin">
+  <div class="modal">
+    <button class="close-x" data-close="modal-admin">&times;</button>
+    <h3>Panel de administración</h3>
+    <div class="tab-row">
+      <button class="tab-btn active" data-tab="tab-nuevo">Nuevo empleado</button>
+      <button class="tab-btn" data-tab="tab-lista">Empleados</button>
+    </div>
+    <div id="tab-nuevo">
+      <label>Número de empleado</label>
+      <input type="text" id="admin-numero" placeholder="Ej. 1023" inputmode="numeric" />
+      <label>Nombre</label>
+      <input type="text" id="admin-nombre" placeholder="Ej. Christian" />
+      <label>Contraseña temporal</label>
+      <input type="text" id="admin-password" placeholder="Ej. 1023" />
+      <label style="display:flex;align-items:center;gap:6px;margin-top:12px;">
+        <input type="checkbox" id="admin-es-admin" style="width:auto;" /> Es administrador
+      </label>
+      <div class="modal-buttons">
+        <button id="btn-create-employee">Crear cuenta</button>
+      </div>
+    </div>
+    <div id="tab-lista" style="display:none;">
+      <div class="employee-list" id="admin-employee-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs, query, onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA1iGPiP8Um2n9WU7WSu7sZlFT3R51ZZM8",
+  authDomain: "calendario-72b7c.firebaseapp.com",
+  projectId: "calendario-72b7c",
+  storageBucket: "calendario-72b7c.firebasestorage.app",
+  messagingSenderId: "310933172283",
+  appId: "1:310933172283:web:8e43e320332d6ff9756c1e"
+};
+
+const FAKE_DOMAIN = "calendario-72b7c.local";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// App secundaria solo para crear usuarios sin perder la sesión del admin
+const secondaryApp = initializeApp(firebaseConfig, "secondary");
+const secondaryAuth = getAuth(secondaryApp);
+
+window.__firebase = {
+  auth, db, signOut, onAuthStateChanged, signInWithEmailAndPassword,
+  createUserWithEmailAndPassword, secondaryAuth,
+  doc, getDoc, setDoc, deleteDoc, collection, getDocs, query, onSnapshot,
+  FAKE_DOMAIN
+};
+</script>
+
 <script>
 (function(){
 // Inicio REAL del ciclo original (para mantener la secuencia exacta)
 const cycleStart = new Date(2025, 8, 15); // 15 Sep 2025
 
-// Rango VISIBLE: Feb 2026 → 14 Sep 2026
+// Rango VISIBLE: Feb 2026 → 31 Dic 2026
 const displayStart = new Date(2026, 1, 1);   // 1 Feb 2026
 const displayEnd   = new Date(2026, 11, 31);  // 31 Dic 2026
 
@@ -164,24 +339,20 @@ const defaultRest = {
   'Mixto':  [2, 3, 6]
 };
 
-// ✅ CONFIGURACIÓN DE DÍAS ESPECIALES CON DIAGONAL ROJA
-// Formato: 'YYYY-M-D' donde M es: Enero=0, Febrero=1, Marzo=2, Abril=3,
-//          Mayo=4, Junio=5, Julio=6, Agosto=7, Sep=8, Oct=9, Nov=10, Dic=11
-// Ejemplos:
-//   '2026-0-1'  → 1 de Enero 2026
-//   '2026-5-15' → 15 de Junio 2026
-//   '2026-11-25'→ 25 de Diciembre 2026
-const defaultSpecialDays = [
-// Agrega aquí los días que quieras tachar con diagonal roja:
-// '2026-5-10',
-// '2026-8-20',
-];
+const defaultSpecialDays = [];
 
 let simulatedStorage = JSON.stringify({ restConfig: defaultRest, specialDays: defaultSpecialDays });
+
+// ---- Estado de sesión y datos ----
+let currentUser = null;       // { uid, numero, nombre, admin }
+let employeesCache = {};      // uid -> {numero, nombre, admin}
+let vacationsCache = [];      // [{id, uid, nombre, inicio, fin, nota}]
 
 const controlsEl = document.getElementById('controls');
 const notificationEl = document.getElementById('notification');
 const currentWeekInfoEl = document.getElementById('current-week-info');
+const sessionBoxEl = document.getElementById('session-box');
+const actionButtonsEl = document.getElementById('action-buttons');
 
 function getWeekNumber(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -196,8 +367,18 @@ function getCurrentRealDate() { return new Date(); }
 function showNotification(message, type = 'success') {
   notificationEl.textContent = message;
   notificationEl.className = `notification ${type} show`;
-  setTimeout(() => { notificationEl.classList.remove('show'); }, 3000);
+  setTimeout(() => { notificationEl.classList.remove('show'); }, 3500);
 }
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => closeModal(btn.dataset.close));
+});
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
 
 function buildControls(restByShift) {
   controlsEl.innerHTML = '';
@@ -265,7 +446,6 @@ function loadConfig() {
 }
 
 function getShiftForDate(date) {
-  // Mantiene la secuencia original contando días desde cycleStart (15 Sep 2025)
   const dayIndex = Math.round((date - cycleStart) / 86400000);
   const blockIndex = Math.floor(dayIndex / 28);
   return shifts[blockIndex % shifts.length];
@@ -280,6 +460,12 @@ function generateDays() {
     arr.push({ date: d, shift: getShiftForDate(d) });
   }
   return arr;
+}
+
+function dateStr(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+function vacationsForDate(cellDateStr) {
+  return vacationsCache.filter(v => cellDateStr >= v.inicio && cellDateStr <= v.fin);
 }
 
 function renderCalendar(restByShift) {
@@ -386,12 +572,25 @@ function renderCalendar(restByShift) {
           }
 
           const cellDateStr = `${cell.date.getFullYear()}-${cell.date.getMonth()}-${cell.date.getDate()}`;
+          const isoDateStr = dateStr(cell.date);
           if (cellDateStr === todayRealStr) td.classList.add('today');
           if (specialDays.includes(cellDateStr)) {
             const diagonal = document.createElement('div');
             diagonal.className = 'diagonal-overlay';
             td.style.position = 'relative';
             td.appendChild(diagonal);
+          }
+
+          const vacsToday = vacationsForDate(isoDateStr);
+          if (vacsToday.length) {
+            td.style.position = 'relative';
+            const badge = document.createElement('div');
+            badge.className = 'vacation-badge';
+            badge.title = vacsToday.map(v => v.nombre + (v.nota ? ' — ' + v.nota : '')).join(', ');
+            badge.textContent = vacsToday.length === 1
+              ? '🏖 ' + vacsToday[0].nombre
+              : '🏖 ' + vacsToday.length + ' empleados';
+            td.appendChild(badge);
           }
         }
         tr.appendChild(td);
@@ -412,9 +611,295 @@ function renderCalendar(restByShift) {
   }, 100);
 }
 
-const savedData = JSON.parse(simulatedStorage);
-buildControls(savedData.restConfig || defaultRest);
-renderCalendar(savedData.restConfig || defaultRest);
+function rerender() {
+  renderCalendar(readRestConfig().Noche ? readRestConfig() : JSON.parse(simulatedStorage).restConfig || defaultRest);
+}
+
+// ===================== FIREBASE / AUTH / VACACIONES =====================
+
+const fb = window.__firebase;
+
+function renderSessionBox() {
+  sessionBoxEl.innerHTML = '';
+  if (currentUser) {
+    const who = document.createElement('span');
+    who.innerHTML = `Hola, <span class="who">${escapeHtml(currentUser.nombre)}</span>${currentUser.admin ? ' (admin)' : ''}`;
+    const logoutBtn = document.createElement('button');
+    logoutBtn.textContent = 'Cerrar sesión';
+    logoutBtn.className = 'secondary';
+    logoutBtn.onclick = doLogout;
+    sessionBoxEl.appendChild(who);
+    sessionBoxEl.appendChild(logoutBtn);
+  } else {
+    const span = document.createElement('span');
+    span.textContent = 'No has iniciado sesión';
+    const loginBtn = document.createElement('button');
+    loginBtn.textContent = 'Iniciar sesión';
+    loginBtn.onclick = () => openModal('modal-login');
+    sessionBoxEl.appendChild(span);
+    sessionBoxEl.appendChild(loginBtn);
+  }
+  renderActionButtons();
+}
+
+function renderActionButtons() {
+  actionButtonsEl.innerHTML = '';
+  const vacBtn = document.createElement('button');
+  vacBtn.textContent = '🏖 Vacaciones';
+  vacBtn.onclick = () => {
+    if (!currentUser) { showNotification('Primero inicia sesión', 'warning'); openModal('modal-login'); return; }
+    openVacacionesModal();
+  };
+  actionButtonsEl.appendChild(vacBtn);
+
+  if (currentUser && currentUser.admin) {
+    const adminBtn = document.createElement('button');
+    adminBtn.textContent = '⚙️ Panel admin';
+    adminBtn.className = 'secondary';
+    adminBtn.onclick = openAdminModal;
+    actionButtonsEl.appendChild(adminBtn);
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function doLogin() {
+  const numero = document.getElementById('login-numero').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!numero || !password) { showNotification('Completa número de empleado y contraseña', 'warning'); return; }
+  const email = numero + '@' + fb.FAKE_DOMAIN;
+  try {
+    await fb.signInWithEmailAndPassword(fb.auth, email, password);
+    closeModal('modal-login');
+    document.getElementById('login-numero').value = '';
+    document.getElementById('login-password').value = '';
+    showNotification('✅ Sesión iniciada');
+  } catch (e) {
+    console.error(e);
+    showNotification('❌ Número de empleado o contraseña incorrectos', 'error');
+  }
+}
+
+async function doLogout() {
+  await fb.signOut(fb.auth);
+  showNotification('Sesión cerrada');
+}
+
+document.getElementById('btn-do-login').addEventListener('click', doLogin);
+document.getElementById('login-password').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+
+// ---- Cargar empleados (para selects y panel admin) ----
+async function loadEmployees() {
+  const snap = await fb.getDocs(fb.collection(fb.db, 'empleados'));
+  employeesCache = {};
+  snap.forEach(d => { employeesCache[d.id] = d.data(); });
+}
+
+// ---- Suscripción en tiempo real a vacaciones (público, sin login) ----
+function subscribeVacations() {
+  const q = fb.query(fb.collection(fb.db, 'vacaciones'));
+  fb.onSnapshot(q, (snap) => {
+    vacationsCache = [];
+    snap.forEach(d => {
+      const data = d.data();
+      vacationsCache.push({ id: d.id, ...data });
+    });
+    rerender();
+  }, (err) => {
+    console.error('Error leyendo vacaciones', err);
+  });
+}
+
+// ---- Modal vacaciones ----
+function openVacacionesModal() {
+  const select = document.getElementById('vac-empleado');
+  select.innerHTML = '';
+  if (currentUser.admin) {
+    Object.entries(employeesCache).forEach(([uid, emp]) => {
+      const opt = document.createElement('option');
+      opt.value = uid;
+      opt.textContent = `${emp.nombre} (#${emp.numero})`;
+      select.appendChild(opt);
+    });
+  } else {
+    const opt = document.createElement('option');
+    opt.value = currentUser.uid;
+    opt.textContent = `${currentUser.nombre} (#${currentUser.numero})`;
+    select.appendChild(opt);
+  }
+  renderVacationList();
+  openModal('modal-vacaciones');
+}
+
+function renderVacationList() {
+  const listEl = document.getElementById('vac-list');
+  listEl.innerHTML = '';
+  const visibles = currentUser.admin
+    ? vacationsCache
+    : vacationsCache.filter(v => v.uid === currentUser.uid);
+
+  if (!visibles.length) {
+    listEl.innerHTML = '<div style="padding:10px;font-size:0.8rem;color:#888;">Sin vacaciones registradas.</div>';
+    return;
+  }
+  visibles
+    .sort((a,b) => a.inicio.localeCompare(b.inicio))
+    .forEach(v => {
+      const row = document.createElement('div');
+      row.className = 'vacation-list-item';
+      const info = document.createElement('span');
+      info.textContent = `${v.nombre}: ${v.inicio} → ${v.fin}${v.nota ? ' (' + v.nota + ')' : ''}`;
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Borrar';
+      delBtn.className = 'danger';
+      delBtn.onclick = () => deleteVacation(v.id);
+      row.appendChild(info);
+      row.appendChild(delBtn);
+      listEl.appendChild(row);
+    });
+}
+
+async function saveVacacion() {
+  const uid = document.getElementById('vac-empleado').value;
+  const inicio = document.getElementById('vac-inicio').value;
+  const fin = document.getElementById('vac-fin').value;
+  const nota = document.getElementById('vac-nota').value.trim();
+  if (!uid || !inicio || !fin) { showNotification('Completa empleado, fecha inicio y fin', 'warning'); return; }
+  if (fin < inicio) { showNotification('La fecha fin no puede ser antes que la fecha inicio', 'warning'); return; }
+
+  const emp = employeesCache[uid] || currentUser;
+  const docId = uid + '_' + inicio + '_' + fin;
+  try {
+    await fb.setDoc(fb.doc(fb.db, 'vacaciones', docId), {
+      uid, nombre: emp.nombre, inicio, fin, nota,
+      registradoPor: currentUser.uid
+    });
+    showNotification('✅ Vacaciones registradas');
+    document.getElementById('vac-inicio').value = '';
+    document.getElementById('vac-fin').value = '';
+    document.getElementById('vac-nota').value = '';
+  } catch (e) {
+    console.error(e);
+    showNotification('❌ No se pudo guardar (revisa permisos)', 'error');
+  }
+}
+
+async function deleteVacation(id) {
+  try {
+    await fb.deleteDoc(fb.doc(fb.db, 'vacaciones', id));
+    showNotification('🗑 Vacaciones eliminadas');
+  } catch (e) {
+    console.error(e);
+    showNotification('❌ No se pudo eliminar', 'error');
+  }
+}
+
+document.getElementById('btn-save-vacacion').addEventListener('click', saveVacacion);
+
+// ---- Panel admin ----
+function openAdminModal() {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-tab="tab-nuevo"]').classList.add('active');
+  document.getElementById('tab-nuevo').style.display = 'block';
+  document.getElementById('tab-lista').style.display = 'none';
+  renderAdminEmployeeList();
+  openModal('modal-admin');
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-nuevo').style.display = btn.dataset.tab === 'tab-nuevo' ? 'block' : 'none';
+    document.getElementById('tab-lista').style.display = btn.dataset.tab === 'tab-lista' ? 'block' : 'none';
+    if (btn.dataset.tab === 'tab-lista') renderAdminEmployeeList();
+  });
+});
+
+function renderAdminEmployeeList() {
+  const listEl = document.getElementById('admin-employee-list');
+  listEl.innerHTML = '';
+  const entries = Object.entries(employeesCache);
+  if (!entries.length) {
+    listEl.innerHTML = '<div style="padding:10px;font-size:0.8rem;color:#888;">Sin empleados registrados.</div>';
+    return;
+  }
+  entries.forEach(([uid, emp]) => {
+    const row = document.createElement('div');
+    row.className = 'employee-row';
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = `<strong>${escapeHtml(emp.nombre)}</strong><span>#${escapeHtml(emp.numero)} ${emp.admin ? '· admin' : ''}</span>`;
+    row.appendChild(meta);
+    listEl.appendChild(row);
+  });
+}
+
+async function createEmployee() {
+  const numero = document.getElementById('admin-numero').value.trim();
+  const nombre = document.getElementById('admin-nombre').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const isAdmin = document.getElementById('admin-es-admin').checked;
+
+  if (!numero || !nombre || !password) { showNotification('Completa todos los campos', 'warning'); return; }
+  if (password.length < 6) { showNotification('La contraseña debe tener al menos 6 caracteres', 'warning'); return; }
+
+  const email = numero + '@' + fb.FAKE_DOMAIN;
+  try {
+    const cred = await fb.createUserWithEmailAndPassword(fb.secondaryAuth, email, password);
+    const uid = cred.user.uid;
+    await fb.setDoc(fb.doc(fb.db, 'empleados', uid), { numero, nombre, admin: isAdmin });
+    await fb.signOut(fb.secondaryAuth);
+    await loadEmployees();
+    renderAdminEmployeeList();
+    showNotification('✅ Cuenta creada para ' + nombre);
+    document.getElementById('admin-numero').value = '';
+    document.getElementById('admin-nombre').value = '';
+    document.getElementById('admin-password').value = '';
+    document.getElementById('admin-es-admin').checked = false;
+  } catch (e) {
+    console.error(e);
+    if (e.code === 'auth/email-already-in-use') {
+      showNotification('❌ Ese número de empleado ya tiene cuenta', 'error');
+    } else {
+      showNotification('❌ Error al crear la cuenta', 'error');
+    }
+  }
+}
+
+document.getElementById('btn-create-employee').addEventListener('click', createEmployee);
+
+// ---- Listener de estado de autenticación ----
+fb.onAuthStateChanged(fb.auth, async (user) => {
+  if (user) {
+    let empData = employeesCache[user.uid];
+    if (!empData) {
+      const snap = await fb.getDoc(fb.doc(fb.db, 'empleados', user.uid));
+      empData = snap.exists() ? snap.data() : { numero: '?', nombre: 'Usuario', admin: false };
+    }
+    currentUser = { uid: user.uid, ...empData };
+  } else {
+    currentUser = null;
+  }
+  renderSessionBox();
+});
+
+// ---- Inicialización general ----
+async function init() {
+  const savedData = JSON.parse(simulatedStorage);
+  buildControls(savedData.restConfig || defaultRest);
+  renderCalendar(savedData.restConfig || defaultRest);
+  renderSessionBox();
+
+  await loadEmployees();
+  subscribeVacations();
+}
+
+init();
 
 })();
 </script>
